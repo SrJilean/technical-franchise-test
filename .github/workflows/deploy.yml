@@ -63,8 +63,10 @@ jobs:
       - name: Force new ECS deployment
         working-directory: ./infra
         run: |
-          SERVICE_NAME=$(terraform output -raw ecs_service_name)
-          CLUSTER_NAME=$(terraform output -raw ecs_cluster_name)
+          SERVICE_NAME=$(terraform output -raw ecs_service_name 2>/dev/null)
+          CLUSTER_NAME=$(terraform output -raw ecs_cluster_name 2>/dev/null)
+
+          echo "Forzando nuevo deploy en ECS..."
           aws ecs update-service \
             --cluster $CLUSTER_NAME \
             --service $SERVICE_NAME \
