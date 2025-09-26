@@ -26,63 +26,67 @@ Las credenciales validas están mas abajo.
 El instructivo se va a hacer con las instrucciones necesarias para realizar la instalación del proyecto en dispositivos
 Windows
 
-1. Clonar el repositorio:
+### 1. Clonar el repositorio:
 
    ```cmd
    git clone https://github.com/<tu-usuario>/technical-franchise-test.git
    cd technical-franchise-test
+   ```
 
 1.1. Los siguientes comandos se deben realizar en la raiz del proyecto
 
-2. Instalar dependencias
+### 2. Instalar dependencias
 
-    ```cmd
     ./mvnw clean install
 
-3. Configurar crecendiales de AWS
+### 3. Configurar crecendiales de AWS
 
-    ```cmd
+   ```cmd
    aws configure
    ```
 
-   A continuación se deben asignar las siguientes credenciales a medida que se vayan pidiendo:
+  A continuación se deben asignar las siguientes credenciales a medida que se vayan pidiendo:
 
-    ```cmd
     AWS Access Key ID [None]: AKIAWIELA72XAZHMT7EY
     AWS Secret Access Key [None]: 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
     Default region name [None]: us-east-1
     Default output format [None]: json
-    ```
 
-4. Hacer build del docker
+### 4. Hacer build del docker
 
-    ```cmd
+Recordar haber abierto el docker desktop antes
+
     docker build -t franchises-svc:local .
-    ```
 
-5. Correr el contenedor
+### 5. Correr el contenedor
 
-    ```cmd
-   docker run -p 8080:8080 -e SPRING_R2DBC_URL="r2dbc:mysql://technical-franchise-test.ceyqol1qxxxd.us-east-1.rds.amazonaws.com:3306/technical_test" -e SPRING_R2DBC_USERNAME="admin" -e SPRING_R2DBC_PASSWORD="19012030Abc" franchises-svc:local
-    ```
+    docker run -p 8080:8080 -e SPRING_R2DBC_URL="r2dbc:mysql://technical-franchise-test.ceyqol1qxxxd.us-east-1.rds.amazonaws.com:3306/technical_test" -e SPRING_R2DBC_USERNAME="admin" -e SPRING_R2DBC_PASSWORD="19012030Abc" franchises-svc:local
 
-6. Probar el servicio
+### 6. Probar el servicio
 
-   ```cmd
-   Invoke-RestMethod -Uri "http://localhost:8080/api/franchises" -Method GET
-   ```
+    Invoke-RestMethod -Uri "http://localhost:8080/api/franchises" -Method GET
 
-## Peticiones a la nube
+    o en Postman
+
+    curl http://localhost:8080/api/franchises
+    curl -X POST http://localhost:8080/api/franchises -H "Content-Type: application/json" -d '{"name":"Nueva Franquicia"}'
+
+---
+
+## 🌐 Peticiones a la nube
 
 Para hacer peticiones a la aplicación alojada en la nube, se pueden hacer directamente al url a continuación:
 
    ```
-   http://44.200.128.110:8080/
+   http://franchises-alb-dev-1578210607.us-east-1.elb.amazonaws.com/
    ```
 
-## Documentación de peticiones
+---
+
+## 📖 Documentación de peticiones
 
 El proyecto incluye una interfaz interactiva de **Swagger UI** para explorar y probar los endpoints disponibles.
 
 Una vez que el servicio esté corriendo, puedes acceder agregando "/swagger-ui.html" al final del url donde estés
-haciendo las peticiones
+haciendo las peticiones, compo por ejemplo, en la nube
+sería: http://franchises-alb-dev-1578210607.us-east-1.elb.amazonaws.com/webjars/swagger-ui/index.html.
