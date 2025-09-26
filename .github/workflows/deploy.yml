@@ -19,6 +19,9 @@ jobs:
           java-version: '17'
           distribution: 'temurin'
 
+      - name: Make mvnw executable
+        run: chmod +x mvnw
+
       - name: Build app
         run: ./mvnw -DskipTests package
 
@@ -42,6 +45,11 @@ jobs:
 
       - name: Push Docker image
         run: docker push 429788298926.dkr.ecr.us-east-1.amazonaws.com/franchises-dev:latest
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v2
+        with:
+          terraform_version: 1.9.5
 
       - name: Deploy with Terraform
         working-directory: ./infra
