@@ -63,8 +63,8 @@ jobs:
       - name: Export Terraform outputs
         working-directory: ./infra
         run: |
-          echo "SERVICE_NAME=$(terraform output -raw ecs_service_name)" >> $GITHUB_ENV
-          echo "CLUSTER_NAME=$(terraform output -raw ecs_cluster_name)" >> $GITHUB_ENV
+          echo "SERVICE_NAME=$(terraform output -json ecs_service_name | jq -r '.')" >> $GITHUB_ENV
+          echo "CLUSTER_NAME=$(terraform output -json ecs_cluster_name | jq -r '.')" >> $GITHUB_ENV
 
       - name: Force new ECS deployment
         run: |
