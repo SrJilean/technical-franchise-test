@@ -66,7 +66,9 @@ jobs:
           SERVICE_NAME=$(terraform output -raw ecs_service_name 2>/dev/null)
           CLUSTER_NAME=$(terraform output -raw ecs_cluster_name 2>/dev/null)
 
-          echo "Forzando nuevo deploy en ECS..."
+          echo "Service: $SERVICE_NAME"
+          echo "Cluster: $CLUSTER_NAME"
+
           aws ecs update-service \
             --cluster $CLUSTER_NAME \
             --service $SERVICE_NAME \
