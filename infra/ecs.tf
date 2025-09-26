@@ -55,7 +55,6 @@ resource "aws_lb" "app" {
   ]
 }
 
-# Target Group para ECS
 resource "aws_lb_target_group" "app" {
   name        = "${var.project}-tg-${var.env}"
   port        = var.container_port
@@ -63,13 +62,12 @@ resource "aws_lb_target_group" "app" {
   vpc_id      = data.aws_vpc.rds_vpc.id
   target_type = "ip"
 
-  # ✅ Health check directo en /
   health_check {
-    path                = "/"
-    interval            = 30
-    timeout             = 5
-    healthy_threshold   = 2
-    unhealthy_threshold = 2
+    path                = "/actuator/health"  # ✅ tu app responde aquí
+    interval            = 60                  # más tiempo entre checks
+    timeout             = 15                  # da chance a responder
+    healthy_threshold   = 5                   # necesita 5 respuestas OK
+    unhealthy_threshold = 5                   # no lo marque unhealthy tan rápido
     matcher             = "200"
   }
 }
