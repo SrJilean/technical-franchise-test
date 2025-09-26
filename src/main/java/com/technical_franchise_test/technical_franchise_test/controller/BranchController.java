@@ -1,7 +1,7 @@
 package com.technical_franchise_test.technical_franchise_test.controller;
 
+import com.technical_franchise_test.technical_franchise_test.dto.BranchNameUpdateRequest;
 import com.technical_franchise_test.technical_franchise_test.model.Branch;
-import com.technical_franchise_test.technical_franchise_test.model.Franchise;
 import com.technical_franchise_test.technical_franchise_test.service.BranchService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -18,6 +18,11 @@ public class BranchController {
     @PostMapping
     public Mono<Branch> createBranch(@Valid @RequestBody Branch branch) {
         return branchService.save(branch);
+    }
+
+    @PutMapping("/update-name/{id}")
+    public Mono<Branch> updateName(@PathVariable Long id, @Valid @RequestBody BranchNameUpdateRequest branch) {
+        return branchService.updateName(id, branch);
     }
 
     @DeleteMapping("/{id}")

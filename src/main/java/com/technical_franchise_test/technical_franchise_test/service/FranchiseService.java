@@ -1,14 +1,11 @@
 package com.technical_franchise_test.technical_franchise_test.service;
 
-import com.technical_franchise_test.technical_franchise_test.model.Branch;
+import com.technical_franchise_test.technical_franchise_test.dto.FranchiseNameUpdateRequest;
 import com.technical_franchise_test.technical_franchise_test.model.Franchise;
-import com.technical_franchise_test.technical_franchise_test.model.Product;
 import com.technical_franchise_test.technical_franchise_test.repository.BranchRepository;
 import com.technical_franchise_test.technical_franchise_test.repository.FranchiseRepository;
-import com.technical_franchise_test.technical_franchise_test.repository.ProductRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 @Service
@@ -22,6 +19,15 @@ public class FranchiseService {
 
     public Mono<Franchise> save(Franchise franchise) {
         return franchiseRepository.save(franchise);
+    }
+
+    public Mono<Franchise> updateName(Long id, FranchiseNameUpdateRequest newFranchise) {
+        return franchiseRepository.findById(id)
+                .switchIfEmpty(Mono.error(new IllegalArgumentException("La franquicia no existe")))
+                .flatMap(franchise -> {
+                    franchise.setName(newFranchise.getName());
+                    return franchiseRepository.save(franchise);
+                });
     }
 
     public Mono<Void> delete(Long id) {

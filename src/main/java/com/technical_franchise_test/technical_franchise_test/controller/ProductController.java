@@ -1,5 +1,6 @@
 package com.technical_franchise_test.technical_franchise_test.controller;
 
+import com.technical_franchise_test.technical_franchise_test.dto.ProductNameUpdateRequest;
 import com.technical_franchise_test.technical_franchise_test.dto.ProductStockUpdateRequest;
 import com.technical_franchise_test.technical_franchise_test.dto.ProductWithBranchResponse;
 import com.technical_franchise_test.technical_franchise_test.model.Product;
@@ -24,6 +25,11 @@ public class ProductController {
     @PostMapping
     public Mono<Product> createProduct(@Valid @RequestBody Product product) {
         return productService.save(product);
+    }
+
+    @PutMapping("/update-name/{id}")
+    public Mono<Product> updateName(@PathVariable Long id, @Valid @RequestBody ProductNameUpdateRequest product) {
+        return productService.updateName(id, product);
     }
 
     @PutMapping("/update-stock/{id}")

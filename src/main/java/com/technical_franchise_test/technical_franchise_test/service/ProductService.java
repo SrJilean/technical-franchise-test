@@ -1,5 +1,6 @@
 package com.technical_franchise_test.technical_franchise_test.service;
 
+import com.technical_franchise_test.technical_franchise_test.dto.ProductNameUpdateRequest;
 import com.technical_franchise_test.technical_franchise_test.dto.ProductStockUpdateRequest;
 import com.technical_franchise_test.technical_franchise_test.dto.ProductWithBranchResponse;
 import com.technical_franchise_test.technical_franchise_test.model.Product;
@@ -43,10 +44,13 @@ public class ProductService {
                 .flatMap(f -> productRepository.save(product));
     }
 
-    public Mono<Void> delete(Long id) {
+    public Mono<Product> updateName(Long id, ProductNameUpdateRequest newProduct) {
         return productRepository.findById(id)
                 .switchIfEmpty(Mono.error(new IllegalArgumentException("El producto no existe")))
-                .flatMap(f -> productRepository.deleteById(id));
+                .flatMap(product -> {
+                    product.setName(newProduct.getName());
+                    return productRepository.save(product);
+                });
     }
 
     public Mono<Product> updateStock(Long id, ProductStockUpdateRequest newProduct) {
@@ -56,5 +60,11 @@ public class ProductService {
                     product.setStock(newProduct.getStock());
                     return productRepository.save(product);
                 });
+    }
+
+    public Mono<Void> delete(Long id) {
+        return productRepository.findById(id)
+                .switchIfEmpty(Mono.error(new IllegalArgumentException("El producto no existe")))
+                .flatMap(f -> productRepository.deleteById(id));
     }
 }
