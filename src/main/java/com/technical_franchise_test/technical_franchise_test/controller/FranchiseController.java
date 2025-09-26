@@ -6,6 +6,7 @@ import com.technical_franchise_test.technical_franchise_test.service.FranchiseSe
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 @RestController
@@ -14,6 +15,16 @@ import reactor.core.publisher.Mono;
 public class FranchiseController {
 
     private final FranchiseService franchiseService;
+
+    @GetMapping()
+    public Flux<Franchise> getAllProducts(){
+        return franchiseService.findAll();
+    }
+
+    @GetMapping("/{id}")
+    public Mono<Franchise> getProductById(@PathVariable Long id){
+        return franchiseService.findById(id);
+    }
 
     @PostMapping
     public Mono<Franchise> createFranchise(@Valid @RequestBody Franchise franchise) {

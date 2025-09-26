@@ -6,6 +6,7 @@ import com.technical_franchise_test.technical_franchise_test.service.BranchServi
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 @RestController
@@ -14,6 +15,16 @@ import reactor.core.publisher.Mono;
 public class BranchController {
 
     private final BranchService branchService;
+
+    @GetMapping()
+    public Flux<Branch> getAllProducts(){
+        return branchService.findAll();
+    }
+
+    @GetMapping("/{id}")
+    public Mono<Branch> getProductById(@PathVariable Long id){
+        return branchService.findById(id);
+    }
 
     @PostMapping
     public Mono<Branch> createBranch(@Valid @RequestBody Branch branch) {

@@ -6,6 +6,7 @@ import com.technical_franchise_test.technical_franchise_test.repository.BranchRe
 import com.technical_franchise_test.technical_franchise_test.repository.FranchiseRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 @Service
@@ -16,6 +17,16 @@ public class FranchiseService {
     private final BranchRepository branchRepository;
 
     private final BranchService branchService;
+
+    public Flux<Franchise> findAll() {
+        return franchiseRepository.findAll();
+    }
+
+    public Mono<Franchise> findById(Long id) {
+        return franchiseRepository.findById(id)
+                .switchIfEmpty(Mono.error(new IllegalArgumentException("La franquicia no existe")));
+
+    }
 
     public Mono<Franchise> save(Franchise franchise) {
         return franchiseRepository.save(franchise);

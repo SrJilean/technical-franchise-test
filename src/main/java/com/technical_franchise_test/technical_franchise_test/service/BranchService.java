@@ -7,6 +7,7 @@ import com.technical_franchise_test.technical_franchise_test.repository.Franchis
 import com.technical_franchise_test.technical_franchise_test.repository.ProductRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 @Service
@@ -18,6 +19,16 @@ public class BranchService {
     private final ProductRepository productRepository;
 
     private final ProductService productService;
+
+    public Flux<Branch> findAll() {
+        return branchRepository.findAll();
+    }
+
+    public Mono<Branch> findById(Long id) {
+        return branchRepository.findById(id)
+                .switchIfEmpty(Mono.error(new IllegalArgumentException("La sucursal no existe")));
+    }
+
 
     public Mono<Branch> save(Branch branch) {
         return franchiseRepository.findById(branch.getFranchiseId())

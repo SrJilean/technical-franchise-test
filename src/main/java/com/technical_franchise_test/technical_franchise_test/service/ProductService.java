@@ -19,6 +19,15 @@ public class ProductService {
     private final BranchRepository branchRepository;
     private final FranchiseRepository franchiseRepository;
 
+    public Flux<Product> findAll() {
+        return productRepository.findAll();
+    }
+
+    public Mono<Product> findById(Long id) {
+        return productRepository.findById(id)
+                .switchIfEmpty(Mono.error(new IllegalArgumentException("El producto no existe")));
+    }
+
     public Flux<ProductWithBranchResponse> mostStockedProduct(Long franchiseId) {
         return franchiseRepository.findById(franchiseId)
                 .switchIfEmpty(Mono.error(new IllegalArgumentException("La franquicia no existe")))

@@ -17,6 +17,16 @@ import reactor.core.publisher.Mono;
 public class ProductController {
     private final ProductService productService;
 
+    @GetMapping()
+    public Flux<Product> getAllProducts(){
+        return productService.findAll();
+    }
+
+    @GetMapping("/{id}")
+    public Mono<Product> getProductById(@PathVariable Long id){
+        return productService.findById(id);
+    }
+
     @GetMapping("/most-stocked/{idFranchise}")
     public Flux<ProductWithBranchResponse> getMostStockedProduct(@PathVariable Long idFranchise) {
         return productService.mostStockedProduct(idFranchise);
