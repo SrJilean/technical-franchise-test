@@ -60,15 +60,16 @@ jobs:
             -var="db_username=${{ secrets.DB_USERNAME }}" \
             -var="db_password=${{ secrets.DB_PASSWORD }}"
 
-      - name: Force new ECS deployment
+      - name: Export Terraform outputs
         working-directory: ./infra
         run: |
-          SERVICE_NAME=$(terraform output -raw ecs_service_name 2>/dev/null)
-          CLUSTER_NAME=$(terraform output -raw ecs_cluster_name 2>/dev/null)
+          echo "SERVICE_NAME=$(terraform output -raw ecs_service_name)" >> $GITHUB_ENV
+          echo "CLUSTER_NAME=$(terraform output -raw ecs_cluster_name)" >> $GITHUB_ENV
 
+      - name: Force new ECS deployment
+        run: |
           echo "Service: $SERVICE_NAME"
           echo "Cluster: $CLUSTER_NAME"
-
           aws ecs update-service \
             --cluster $CLUSTER_NAME \
             --service $SERVICE_NAME \
