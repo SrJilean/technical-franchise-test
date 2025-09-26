@@ -21,7 +21,7 @@ resource "aws_ecs_task_definition" "app" {
         protocol      = "tcp"
       }],
       environment = [
-        { name = "SPRING_R2DBC_URL",      value = "r2dbc:mysql://<RDS-ENDPOINT>:3306/technical_test" },
+        { name = "SPRING_R2DBC_URL", value = "r2dbc:mysql://technical-franchise-test.ceyqol1qxxxd.us-east-1.rds.amazonaws.com:3306/technical_test" },
         { name = "SPRING_R2DBC_USERNAME", value = "admin" },
         { name = "SPRING_R2DBC_PASSWORD", value = "19012030Abc" }
       ],
