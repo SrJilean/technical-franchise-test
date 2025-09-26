@@ -59,3 +59,13 @@ jobs:
             -var="db_url=${{ secrets.DB_URL }}" \
             -var="db_username=${{ secrets.DB_USERNAME }}" \
             -var="db_password=${{ secrets.DB_PASSWORD }}"
+
+      - name: Force new ECS deployment
+        working-directory: ./infra
+        run: |
+          SERVICE_NAME=$(terraform output -raw ecs_service_name)
+          CLUSTER_NAME=$(terraform output -raw ecs_cluster_name)
+          aws ecs update-service \
+            --cluster $CLUSTER_NAME \
+            --service $SERVICE_NAME \
+            --force-new-deployment
