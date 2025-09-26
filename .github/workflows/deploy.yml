@@ -67,6 +67,7 @@ jobs:
           echo "CLUSTER_NAME=$(terraform output -json ecs_cluster_name | jq -r '.')" >> $GITHUB_ENV
 
       - name: Force new ECS deployment
+        working-directory: ./infra
         run: |
           echo "Service: $SERVICE_NAME"
           echo "Cluster: $CLUSTER_NAME"
