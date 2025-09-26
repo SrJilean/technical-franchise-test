@@ -45,7 +45,15 @@ resource "aws_ecs_service" "app" {
   launch_type     = "FARGATE"
 
   network_configuration {
-    subnets          = data.aws_subnets.rds_subnets.ids
+    # 🔹 Aquí ya metemos las subnets explícitas
+    subnets         = [
+      "subnet-09c1b6c9ae2bdfa08",
+      "subnet-07f4efeeaea60d24b",
+      "subnet-0b406eb1a7e1f9e69",
+      "subnet-0f3ad9a9a57403a31",
+      "subnet-0445e2e018a4afd0e",
+      "subnet-0feb086fc62f3dabb"
+    ]
     security_groups  = [aws_security_group.ecs_sg.id]
     assign_public_ip = true
   }

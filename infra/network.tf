@@ -3,11 +3,25 @@ data "aws_vpc" "rds_vpc" {
   id = "vpc-02bb3861cedac74cc"
 }
 
-# Usar las mismas subnets que el grupo de subredes de RDS
+# Subnets privadas (donde está RDS) - solo para conexión DB
 data "aws_subnets" "rds_subnets" {
   filter {
     name   = "vpc-id"
     values = [data.aws_vpc.rds_vpc.id]
+  }
+}
+
+# Subnets públicas (donde debe correr ECS con IP pública)
+data "aws_subnets" "public_subnets" {
+  filter {
+    name   = "vpc-id"
+    values = [data.aws_vpc.rds_vpc.id]
+  }
+
+  # 👇 Esto depende de cómo nombraste tus subnets
+  filter {
+    name   = "tag:Name"
+    values = ["*public*"]
   }
 }
 
