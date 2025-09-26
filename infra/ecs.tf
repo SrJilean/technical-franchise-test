@@ -12,24 +12,24 @@ resource "aws_ecs_task_definition" "app" {
 
   container_definitions = jsonencode([
     {
-      name      = "app",
-      image     = "${aws_ecr_repository.app.repository_url}:latest",
-      essential = true,
+      name      = "app"
+      image     = "${aws_ecr_repository.app.repository_url}:latest"
+      essential = true
       portMappings = [{
-        containerPort = var.container_port,
-        hostPort      = var.container_port,
+        containerPort = var.container_port
+        hostPort      = var.container_port
         protocol      = "tcp"
-      }],
+      }]
       environment = [
         { name = "SPRING_R2DBC_URL", value = var.db_url },
         { name = "SPRING_R2DBC_USERNAME", value = var.db_username },
         { name = "SPRING_R2DBC_PASSWORD", value = var.db_password }
-      ],
+      ]
       logConfiguration = {
-        logDriver = "awslogs",
+        logDriver = "awslogs"
         options = {
-          awslogs-group         = aws_cloudwatch_log_group.app.name,
-          awslogs-region        = "us-east-1",
+          awslogs-group         = aws_cloudwatch_log_group.app.name
+          awslogs-region        = "us-east-1"
           awslogs-stream-prefix = "ecs"
         }
       }
@@ -37,6 +37,56 @@ resource "aws_ecs_task_definition" "app" {
   ])
 }
 
+# Application Load Balancer
+resource "aws_lb" "app" {
+  name               = "${var.project}-alb-${var.env}"
+  internal           = false
+  load_balancer_type = "application"
+  security_groups    = [aws_security_group.alb_sg.id]
+
+  # ✅ Usamos todas las subnets públicas que confirmaste
+  subnets = [
+    "subnet-09c1b6c9ae2bdfa08", # us-east-1f
+    "subnet-07f4efeeaea60d24b", # us-east-1e
+    "subnet-0b406eb1a7e1f9e69", # us-east-1b
+    "subnet-0f3ad9a9a57403a31", # us-east-1c
+    "subnet-0445e2e018a4afd0e", # us-east-1d
+    "subnet-0feb086fc62f3dabb"  # us-east-1a
+  ]
+}
+
+# Target Group para ECS
+resource "aws_lb_target_group" "app" {
+  name        = "${var.project}-tg-${var.env}"
+  port        = var.container_port
+  protocol    = "HTTP"
+  vpc_id      = data.aws_vpc.rds_vpc.id
+  target_type = "ip"
+
+  # ✅ Health check directo en /
+  health_check {
+    path                = "/"
+    interval            = 30
+    timeout             = 5
+    healthy_threshold   = 2
+    unhealthy_threshold = 2
+    matcher             = "200"
+  }
+}
+
+# Listener para ALB
+resource "aws_lb_listener" "app" {
+  load_balancer_arn = aws_lb.app.arn
+  port              = 80
+  protocol          = "HTTP"
+
+  default_action {
+    type             = "forward"
+    target_group_arn = aws_lb_target_group.app.arn
+  }
+}
+
+# ECS Service con Load Balancer
 resource "aws_ecs_service" "app" {
   name            = "${var.project}-svc-${var.env}"
   cluster         = aws_ecs_cluster.this.id
@@ -45,8 +95,8 @@ resource "aws_ecs_service" "app" {
   launch_type     = "FARGATE"
 
   network_configuration {
-    # 🔹 Aquí ya metemos las subnets explícitas
-    subnets         = [
+    # ✅ Fuerzo las mismas subnets públicas que usa el ALB
+    subnets = [
       "subnet-09c1b6c9ae2bdfa08",
       "subnet-07f4efeeaea60d24b",
       "subnet-0b406eb1a7e1f9e69",
@@ -57,4 +107,12 @@ resource "aws_ecs_service" "app" {
     security_groups  = [aws_security_group.ecs_sg.id]
     assign_public_ip = true
   }
+
+  load_balancer {
+    target_group_arn = aws_lb_target_group.app.arn
+    container_name   = "app"                  # 👈 debe coincidir con el task
+    container_port   = var.container_port
+  }
+
+  depends_on = [aws_lb_listener.app]
 }
